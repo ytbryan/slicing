@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Slicing::VERSION
   spec.authors       = ["Bryan Lim"]
   spec.email         = ["ytbryan@gmail.com"]
-  spec.summary       = %q{}
-  spec.description   = %q{}
-  spec.homepage      = ""
+  spec.summary       = %q{slice and dice CSV file via command line}
+  spec.description   = %q{slice and dice CSV file via command line}
+  spec.homepage      = "http://github.com/ytbryan/slicing"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
