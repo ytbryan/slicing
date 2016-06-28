@@ -70,5 +70,24 @@ module Slicing
       end
     end
 
+
+    desc :subset2, ""
+    def subset2 csv_file, output, value=10
+      path = csv_file
+      output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
+      stop = value
+      counter = 0
+      CSV.foreach(path, :headers => false, :row_sep => "/n/r" encoding: "ISO8859-1:utf-8") do |row|
+        exit if counter == stop
+        begin
+          counter = counter + 1
+          CSV.open(output_directory, "a+") do |csv|
+            csv << row
+          end
+        rescue
+        end
+      end
+    end
+
   end
 end
