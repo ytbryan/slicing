@@ -98,11 +98,11 @@ module Slicing
     end
 
     desc :subset, ""
-    method_options :num, type: :numeric, aliases: '-n'
-    def subset(csv_file, output)
+    # method_options :num, type: :numeric, aliases: '-n'
+    def subset(csv_file, output, value=10000)
       path = csv_file
       output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
-      options[:num] == nil ? (stop = 10) : (stop = options[:num])
+      # options[:num] == nil ? (stop = 10) : (stop = options[:num])
       counter = 0
       CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
         exit if counter == stop
