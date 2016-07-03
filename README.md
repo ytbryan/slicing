@@ -1,5 +1,14 @@
 # Slicing
-:v: Slice and dice your csv files for further analysis
+:v: Slice and dice your csv files for further analysis.
+
+# Reason for making slicing
+No database required, mom!
+
+Data slicing and cleaning usually happen within a database like mysql or postgresql. And you will need to use sql command to manipulate the data.
+
+I thought why can't I slice and dice them on the go. And take a subset of the data and peek it through excel or a text-editor.
+
+Hence, slicing is created to make it easy to slice csv files from terminal.
 
 ## Installation
 
@@ -18,16 +27,17 @@ Or install it yourself as:
     $ gem install slicing
 
 ## Usage
+`slicing mask` - mask the column with md5.
 
-`slicing subset` -
+`slicing subset` - return a subset of 10 lines of the bigger csv file.
 
-`slicing head` -
+`slicing head` - return the header of the csv file.
 
-`slicing rm` -
+`slicing rm` - remove the column from csv file.
 
-`slicing first` -
+`slicing first` - return the first line of data of the csv file.
 
-`slicing count` -
+`slicing count` - return the total row and column of the csv file.
 
 ## Development
 
