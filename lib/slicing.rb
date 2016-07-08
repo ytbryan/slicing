@@ -1,73 +1,78 @@
 require "slicing/version"
+require 'digest/md5'
 require 'thor'
 require 'csv'
-require 'digest/md5'
 
 module Slicing
   class Base < Thor
     check_unknown_options!
     package_name 'slicing'
-    default_task :hello
+    default_task :help
 
-    desc :mask, ""
+    desc :sample, "create a sample output"
+    def sample path, output_path, size
+      file_csv = CSV.read(path,:headers=> true, :encoding => "ISO8859-1:utf-8")
+      sample = file_csv.sample(size)
+      CSV.open(output_path, "a+") do |csv|
+        sample.each do |value|
+          csv << value
+        end
+      end
+    end
+
+    desc :freq, "calculate item frequencies"
+    def freq path, column_name, output_path
+      file_to_count = "./#{path}.csv"
+      output = "./#{path}-counted.csv"
+      file_to_count_csv = CSV.read(file_to_count,:headers=> true, :encoding => "ISO8859-1:utf-8")
+      unique_nric_array = file_to_count_csv[column_name]
+      unique_nric = []
+      unique_nric_array.each_with_index do |value, index|
+        unique_nric.push(value) if index !=0
+      end
+
+      final_hash = score(unique_nric)
+      CSV.open(output, "a+") do |csv|
+        final_hash.each do |value|
+          csv << [value[0], value[1]]
+        end
+      end
+    end
+
+
+    desc :mask, "mask a particular column"
     def mask path, column_name, output_path
-      # array = [1,2,3,4,5,6] #great, this works
       original = CSV.read(path, { headers: true, return_headers: true, :encoding => "ISO8859-1:utf-8"})
-      #is there a way to figure out
-      #loop through and find the column name. if you cannot find it, exit.
-
-      CSV.open(output_path, 'w') do |csv|
+      CSV.open(output_path, 'a+') do |csv|
         original.each do |row|
-          #apply mask on the column
-          #save it back to the csv
           csv << array
         end
       end
     end
 
-
-    desc :rm, ""
-    method_option :encoding, type: :boolean, aliases: '-e'
+    desc :rm, "remove a column"
+    method_option :utf, type: :string, aliases: '-u', default: "ISO8859-1:utf-8"
+    method_option :headers, type: :boolean, aliases: '-h', default: true
+    method_option :rowsep, type: :string, aliases: '-r', default: nil
     def rm path, column_name, output
-      original = CSV.read(path, { headers: true, return_headers: true, :encoding => "ISO8859-1:utf-8"})
+      # headers, rowsep, utf = process_options(options[:headers], options[:rowsep], options[:utf])
+      if options[:rowsep] != nil
+        original = CSV.read(path, { headers: options[:headers], return_headers: options[:headers], :row_sep=> options[:rowsep], :encoding => options[:utf]})
+      else
+        original = CSV.read(path, { headers: options[:headers], return_headers: options[:headers], :encoding => options[:utf]})
+      end
       original.delete(column_name)
-      # data = CSV.read(path, :headers=> false, :encoding => "ISO8859-1:utf-8") #2014
-      # data.delete(column_name)
-      CSV.open(output, 'w') do |csv|
+      CSV.open(output, 'a+') do |csv|
         original.each do |row|
           csv << row
         end
       end
-
-      # CSV.open(output,"a+") do |csv|
-      #   data.each_with_index do |row,index|
-      #     csv << row
-      #   end
-      # end
     end
 
-    desc :rmagain, ""
-    def rmagain path, column_name, output
-      # original = CSV.read(path,{ headers: true, return_headers: true, encoding: "ISO8859-1:utf-8", row_sep: "\r\n"})
-      original = CSV.read(path, :headers=> false, :return_headers => true, :row_sep => "\r\n", :encoding => "ISO8859-1:utf-8") #2014
-      original.delete(column_name)
-      CSV.open(output, 'w') do |csv|
-        original.each do |row|
-          csv << row
-        end
-      end
-
-      # CSV.open(output,"a+") do |csv|
-      #   data.each_with_index do |row,index|
-      #     csv << row
-      #   end
-      # end
-    end
-
-
-    desc :first, ""
+    desc :first, "display the first numbers of line"
+    method_option :line, type: :numeric, aliases: '-l', default: 100
     def first csv_file #, value=100
-      stop = 100
+      stop = options[:line]
       counter = 0
       CSV.foreach(csv_file, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
         exit if counter == stop
@@ -76,11 +81,10 @@ module Slicing
           puts row
         rescue
         end
-
       end
     end
 
-    desc :head, ""
+    desc :head, "show the headers"
     def head csv_file
       CSV.foreach(csv_file, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
         puts row
@@ -90,19 +94,29 @@ module Slicing
       end
     end
 
-
-    desc :count, ""
-    def count csv_file
-      data = CSV.read(csv_file, :headers => false, encoding: "ISO8859-1:utf-8")
-      puts "#{data.count} rows"
+    desc :unique, "calculate number of unique values in column"
+    def unique path, column_name
+      data = CSV.read(path, :headers => true, return_headers: true, encoding: "ISO8859-1:utf-8")
+      array = data[column_name]
+      puts array.uniq.count if array != nil
     end
 
-    desc :subset, ""
-    # method_options :num, type: :numeric, aliases: '-n'
-    def subset(csv_file, output, value=10000)
+
+    desc :count, "count the number of rows and columns"
+    def count csv_file
+      data = CSV.read(csv_file, :headers => false, encoding: "ISO8859-1:utf-8")
+      puts "#{data.count} rows #{data[0].count} columns"
+      puts "---"
+      puts "#{data[0]}"
+    end
+
+    desc :subset, "create a subset of the data"
+    method_option :line, type: :numeric, aliases: '-l', default: 1000
+    def subset(csv_file, output)
       path = csv_file
       output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
       # options[:num] == nil ? (stop = 10) : (stop = options[:num])
+      stop = options[:line]
       counter = 0
       CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
         exit if counter == stop
@@ -116,38 +130,45 @@ module Slicing
       end
     end
 
-
-    desc :subsetagain, ""
-    def subsetagain csv_file, output, value=10
-      path = csv_file
-      output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
-      stop = value
-      counter = 0
-      CSV.foreach(path, :headers => false, :row_sep => "\r\n", encoding: "ISO8859-1:utf-8") do |row|
-        exit if counter == stop
-        begin
-          counter = counter + 1
-          CSV.open(output_directory, "a+") do |csv|
-            csv << row
-          end
-        rescue
-        end
-      end
-    end
-
-
-
+    # desc :subsetagain, ""
+    # def subsetagain csv_file, output, value=10
+    #   path = csv_file
+    #   output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
+    #   stop = value
+    #   counter = 0
+    #   CSV.foreach(path, :headers => false, :row_sep => "\r\n", encoding: "ISO8859-1:utf-8") do |row|
+    #     exit if counter == stop
+    #     begin
+    #       counter = counter + 1
+    #       CSV.open(output_directory, "a+") do |csv|
+    #         csv << row
+    #       end
+    #     rescue
+    #     end
+    #   end
+    # end
 
     private
 
+    def process_options headers, rowsep, utf
+      if headers == nil
+        headers = true
+      else
+        headers = headers
+      end
+      return true, "\r\n" , "ISO8859-1:utf-8"
+    end
+
     def masking(value)
       value != nil ? answer = Digest::MD5.hexdigest(value) : answer
-      # if value != nil
-      #   return Digest::MD5.hexdigest(value)
-      # else
-      #   return ""
-      # end
     end
+
+    def score( array )
+      hash = Hash.new(0)
+      array.each{|key| hash[key] += 1}
+      hash
+    end
+
 
   end
 end
