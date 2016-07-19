@@ -9,10 +9,80 @@ module Slicing
     package_name 'slicing'
     default_task :help
 
-    desc :reduce, "reduce csv to smaller rows"
-    def reduce start
+    # desc :gsub, ""
+    # def gsub path, output, first, second
+    #   CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |row|
+    #     puts row
+    #     row.map {|n| n.gsub(first,second) if n !=nil}
+    #     CSV.open(output, "a+") do |csv|
+    #       csv << row
+    #     end
+    #   end
+    #
+    # end
+    #
+    # desc :trim, "clean up by removing rows with column value"
+    # def trim path, output#, name, value
+    #   CSV.foreach(path) do |row|
+    #     row.map {|n| n.strip! || n}
+    #     CSV.open(output, "a+") do |csv|
+    #       csv << row
+    #     end
+    #   end
+    # end
+
+    desc :clean, "clean up by removing rows with column value"
+    def clean path, output, name, value
+      # puts "add header"
     end
 
+    desc :add, "add a header"
+    def add path, output, *headers
+      index = 0
+      CSV.foreach(path) do |row|
+        CSV.open(output, "a+") do |csv|
+          if index == 0
+            csv << headers
+          end
+          csv << row
+        end
+        index = index +1
+      end
+    end
+
+    desc :show, "show a specific row"
+    def show path, output, start
+      index = 1
+      CSV.foreach(path) do |csv|
+        if index == start.to_i
+          puts csv
+          break
+        end
+        index = index + 1
+      end
+    end
+
+    desc :list, "list unique items in a column"
+    def list path, name
+      file_csv = CSV.read(path,:headers=> true, :encoding => "ISO8859-1:utf-8")
+      array = file_csv[name]
+      puts array.uniq
+      puts "--"
+      puts "#{array.uniq.count} items"
+    end
+
+    desc :reduce, "reduce csv to smaller rows"
+    def reduce path, output, start
+      index = 0
+      CSV.foreach(path) do |csv|
+        CSV.open(output, "a+") do |row|
+          if start.to_i > index #dangerous
+            csv << row
+          end
+        end
+        index = index +1
+      end
+    end
 
     desc :sample, "create a sample output"
     def sample path, output_path, size
@@ -44,7 +114,6 @@ module Slicing
       end
     end
 
-
     desc :mask, "mask a particular column"
     def mask path, column_name, output_path
       original = CSV.read(path, { headers: true, return_headers: true, :encoding => "ISO8859-1:utf-8"})
@@ -55,12 +124,37 @@ module Slicing
       end
     end
 
-
     desc :retain, "retain only these column"
-    def retain path, names*
+    def retain path, output, *names
+      value = ""
+      CSV.foreach(path) do |data|
+        value = data
+        break
+      end
+
+      array = []
+      names.each do |each_name|
+        if value.index(each_name) == nil
+          puts "#{each_name} is not a column name."
+          puts "--"
+          puts value
+          exit
+        end
+        array.push(value.index(each_name)) if value.index(each_name) != nil
+      end
+      # puts array.count
+      answer =
+      CSV.open(output,"a+") do |csv|
+        CSV.foreach(path) do |row|
+          answer = []
+          array.each do |each|
+            answer.push(row[each])
+          end
+          csv << answer
+        end
+      end
 
     end
-
 
     desc :rm, "remove a column"
     method_option :utf, type: :string, aliases: '-u', default: "ISO8859-1:utf-8"
