@@ -9,6 +9,11 @@ module Slicing
     package_name 'slicing'
     default_task :help
 
+    desc :reduce, "reduce csv to smaller rows"
+    def reduce start
+    end
+
+
     desc :sample, "create a sample output"
     def sample path, output_path, size
       file_csv = CSV.read(path,:headers=> true, :encoding => "ISO8859-1:utf-8")
@@ -49,6 +54,13 @@ module Slicing
         end
       end
     end
+
+
+    desc :retain, "retain only these column"
+    def retain path, names*
+
+    end
+
 
     desc :rm, "remove a column"
     method_option :utf, type: :string, aliases: '-u', default: "ISO8859-1:utf-8"
@@ -169,6 +181,10 @@ module Slicing
       hash
     end
 
+    def print_progress current, total
+      percent = current/total * 100
+      STDOUT.write "\r #{index} - #{percent}% completed."
+    end
 
   end
 end
