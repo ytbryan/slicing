@@ -214,6 +214,8 @@ module Slicing
       puts "#{data.count} rows #{data[0].count} columns"
       puts "---"
       puts "#{data[0]}"
+      puts "---"
+      print_header(data[0])
     end
 
     desc :subset, "create a subset of the data"
@@ -255,6 +257,10 @@ module Slicing
     # end
 
     private
+
+    def print_header array
+      puts array.join(",") if array != nil
+    end
 
     def process_options headers, rowsep, utf
       if headers == nil
