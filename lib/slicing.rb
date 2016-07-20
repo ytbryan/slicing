@@ -196,6 +196,8 @@ module Slicing
         puts row
         puts "----"
         puts "#{row.count} columns"
+        puts "----"
+        print_header(row)
         exit
       end
     end
