@@ -36,6 +36,43 @@ module Slicing
       # puts "add header"
     end
 
+
+    desc :equal, "equal "
+    def equal path, column_name, value
+
+      index = 0
+      str = ""
+      CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
+        str = row
+        exit
+      end
+      array = str.split(",")
+      index = array.index(column_name)
+
+      #get the number
+      answer = 0
+      CSV.foreach(path) do |row|
+        answer = answer + 1 if row[index] == value
+      end
+      puts answer
+    end
+
+
+
+    desc :remove, "remove a header"
+    def remove path, output
+      index = 0
+      CSV.foreach(path) do |row|
+        CSV.open(output, "a+") do |csv|
+          if index != 0
+            csv << row
+          end
+        end
+        index = index +1
+      end
+    end
+
+
     desc :add, "add a header"
     def add path, output, *headers
       index = 0
