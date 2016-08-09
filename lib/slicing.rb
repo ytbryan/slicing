@@ -342,8 +342,9 @@ module Slicing
     end
 
     def print_header_with_quote array
-      puts "#{"array.join("' '")"}" if array != nil
+      puts "'#{array.join("' '")}'" if array != nil
     end
+
     def process_options headers, rowsep, utf
       if headers == nil
         headers = true
