@@ -9,6 +9,46 @@ module Slicing
     package_name 'slicing'
     default_task :help
 
+    desc :cat, "cat two csv files and keep the headers using the first csv"
+    def cat path, path_column, path2, path2_column, output
+
+    end
+
+    desc :combine, "combine"
+    def combine path, path_column, path2, path2_column, output
+
+    end
+
+    desc :append, "append"
+    def append path, output, value
+      data_to_merge = CSV.read(path,:headers=> true, :encoding => "ISO8859-1:utf-8") #TODO: is this a data
+      CSV.open(output, "a+") do |csv|
+        data_to_merge.each_with_index do |data,index|
+          csv << data.push(value)
+        end
+      end
+    end
+
+    desc :keep, "keep the columns"
+    def keep path, output, *column
+      data = CSV.read(path, :headers=> true, :encoding => "ISO8859-1:utf-8") #2014
+      header = data[0]
+      column_array = []
+      column.size.times do |index|
+        column_array.push(header.index(column[index]))
+      end
+      CSV.open(output,"a+") do |csv|
+        data.each_with_index do |row,index|
+          array = []
+          column.size.times do |value|
+            array.push(row[column[value]])
+          end
+          csv << array
+        end
+      end
+
+    end
+
     # desc :gsub, ""
     # def gsub path, output, first, second
     #   CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |row|
@@ -34,21 +74,38 @@ module Slicing
     desc :clean, "clean up by removing rows with column value"
     def clean path, output, name, value
       # puts "add header"
+
+
     end
 
 
-    desc :equal, "equal "
-    def equal path, column_name, value
-
+    desc :produce, "produce "
+    def produce path, column_name, value, output
       index = 0
       str = ""
-      CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
+      CSV.foreach(path, :headers => true, encoding: "ISO8859-1:utf-8") do |row|
         str = row
-        exit
+        break
       end
-      array = str.split(",")
-      index = array.index(column_name)
+      index = str.index(column_name)
+      answer = 0
+      CSV.open(output, "a+") do |csv|
+        CSV.foreach(path) do |row|
+          csv << row if row[index] == value
+        end
+      end
+    end
 
+    desc :equal, "equal "
+    def equal path, column_name, value
+      index = 0
+      str = ""
+      CSV.foreach(path, :headers => true, encoding: "ISO8859-1:utf-8") do |row|
+        str = row
+        break
+      end
+      # array = str.to_s.split(",")
+      index = str.index(column_name)
       #get the number
       answer = 0
       CSV.foreach(path) do |row|
@@ -296,6 +353,16 @@ module Slicing
     # end
 
     private
+
+
+    def createArray(csv, array)
+      csv << array
+    end
+
+    # def array array, last_item
+    #   return array.push(last_item)
+    # end
+
 
     def print_header array
       puts array.join(",") if array != nil

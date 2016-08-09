@@ -1,14 +1,23 @@
 # Slicing
-:v: Slice and dice your csv files for further analysis.
+:v: Instant slice and dice your csv files for quick analysis via command line.
 
-# Reason for making slicing
-No database required, mom!
 
-Data slicing and cleaning usually happen within a database like mysql or postgresql. And you will need to use sql command to manipulate the data.
+#Features
 
-I thought why can't I slice and dice them on the go. And take a subset of the data and peek it through excel or a text-editor.
+- `slicing keep` - produce a csv with specific columns kept.
 
-Hence, slicing is created to make it easy to slice csv files from terminal.
+  eg. `slicing keep input.csv output.csv 'Column1' 'Column2' 'Column6'`
+
+- `slicing count` - count the row csv and produce the column.
+
+  eg. `slicing count input.csv`
+
+
+  - `slicing head` - print the header only
+
+    eg. `slicing head input.csv`
+
+
 
 ## Installation
 
