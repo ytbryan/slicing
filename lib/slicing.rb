@@ -9,6 +9,51 @@ module Slicing
     package_name 'slicing'
     default_task :help
 
+
+    desc :produce, "produce output.csv with the column value equal to given value"
+    def produce path, column_name, value, output
+      index = 0
+      str = ""
+      CSV.foreach(path, :headers => true, encoding: "ISO8859-1:utf-8") do |row|
+        str = row
+        break
+      end
+      index = str.index(column_name)
+      answer = 0
+      CSV.open(output, "a+") do |csv|
+        CSV.foreach(path) do |row|
+          csv << row if row[index] == value
+        end
+      end
+    end
+
+    desc :clean, "clean up by removing rows with column value"
+    def clean path, output, name, value
+      # puts "add header"
+    end
+
+    # desc :gsub, ""
+    # def gsub path, output, first, second
+    #   CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |row|
+    #     puts row
+    #     row.map {|n| n.gsub(first,second) if n !=nil}
+    #     CSV.open(output, "a+") do |csv|
+    #       csv << row
+    #     end
+    #   end
+    #
+    # end
+    #
+    # desc :trim, "clean up by removing rows with column value"
+    # def trim path, output#, name, value
+    #   CSV.foreach(path) do |row|
+    #     row.map {|n| n.strip! || n}
+    #     CSV.open(output, "a+") do |csv|
+    #       csv << row
+    #     end
+    #   end
+    # end
+
     desc :cat, "cat two csv files and keep the headers using the first csv"
     def cat path, path_column, path2, path2_column, output
 
@@ -46,55 +91,8 @@ module Slicing
           csv << array
         end
       end
-
     end
 
-    # desc :gsub, ""
-    # def gsub path, output, first, second
-    #   CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |row|
-    #     puts row
-    #     row.map {|n| n.gsub(first,second) if n !=nil}
-    #     CSV.open(output, "a+") do |csv|
-    #       csv << row
-    #     end
-    #   end
-    #
-    # end
-    #
-    # desc :trim, "clean up by removing rows with column value"
-    # def trim path, output#, name, value
-    #   CSV.foreach(path) do |row|
-    #     row.map {|n| n.strip! || n}
-    #     CSV.open(output, "a+") do |csv|
-    #       csv << row
-    #     end
-    #   end
-    # end
-
-    desc :clean, "clean up by removing rows with column value"
-    def clean path, output, name, value
-      # puts "add header"
-
-
-    end
-
-
-    desc :produce, "produce "
-    def produce path, column_name, value, output
-      index = 0
-      str = ""
-      CSV.foreach(path, :headers => true, encoding: "ISO8859-1:utf-8") do |row|
-        str = row
-        break
-      end
-      index = str.index(column_name)
-      answer = 0
-      CSV.open(output, "a+") do |csv|
-        CSV.foreach(path) do |row|
-          csv << row if row[index] == value
-        end
-      end
-    end
 
     desc :equal, "equal "
     def equal path, column_name, value
@@ -292,6 +290,8 @@ module Slicing
         puts "#{row.count} columns"
         puts "----"
         print_header(row)
+        puts "----"
+        print_header_with_quote(row)
         exit
       end
     end
@@ -312,6 +312,8 @@ module Slicing
       puts "#{data[0]}"
       puts "---"
       print_header(data[0])
+      puts "---"
+      print_header_with_quote(data[0])
     end
 
     desc :subset, "create a subset of the data"
@@ -319,7 +321,6 @@ module Slicing
     def subset(csv_file, output)
       path = csv_file
       output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
-      # options[:num] == nil ? (stop = 10) : (stop = options[:num])
       stop = options[:line]
       counter = 0
       CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
@@ -334,40 +335,15 @@ module Slicing
       end
     end
 
-    # desc :subsetagain, ""
-    # def subsetagain csv_file, output, value=10
-    #   path = csv_file
-    #   output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
-    #   stop = value
-    #   counter = 0
-    #   CSV.foreach(path, :headers => false, :row_sep => "\r\n", encoding: "ISO8859-1:utf-8") do |row|
-    #     exit if counter == stop
-    #     begin
-    #       counter = counter + 1
-    #       CSV.open(output_directory, "a+") do |csv|
-    #         csv << row
-    #       end
-    #     rescue
-    #     end
-    #   end
-    # end
-
     private
-
-
-    def createArray(csv, array)
-      csv << array
-    end
-
-    # def array array, last_item
-    #   return array.push(last_item)
-    # end
-
 
     def print_header array
       puts array.join(",") if array != nil
     end
 
+    def print_header_with_quote array
+      puts "#{"array.join("' '")"}" if array != nil
+    end
     def process_options headers, rowsep, utf
       if headers == nil
         headers = true

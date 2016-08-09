@@ -12,11 +12,13 @@
 
   eg. `slicing count input.csv`
 
+- `slicing head` - print the header only
 
-  - `slicing head` - print the header only
+  eg. `slicing head input.csv`
 
-    eg. `slicing head input.csv`
+- `slicing first` - return the first line of data of the csv file.
 
+  eg. `slicing first input.csv`
 
 
 ## Installation
