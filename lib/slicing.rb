@@ -70,17 +70,17 @@ module Slicing
     #
     # end
 
-    desc :cat, "cat two csv files and keep the headers using the first csv"
-    def cat path, path_column, path2, path2_column, output
+    # desc :cat, "cat two csv files and keep the headers using the first csv"
+    # def cat path, path_column, path2, path2_column, output
+    #
+    # end
+    #
+    # desc :combine, "combine"
+    # def combine path, path_column, path2, path2_column, output
+    #
+    # end
 
-    end
-
-    desc :combine, "combine"
-    def combine path, path_column, path2, path2_column, output
-
-    end
-
-    desc :append, "append"
+    desc :append, "append a value to all rows"
     def append path, output, value
       data_to_merge = CSV.read(path,:headers=> true, :encoding => "ISO8859-1:utf-8") #TODO: is this a data
       CSV.open(output, "a+") do |csv|
@@ -110,7 +110,7 @@ module Slicing
     end
 
 
-    desc :equal, "equal "
+    desc :equal, "calculate the value equal to given value"
     def equal path, column_name, value
       index = 0
       str = ""
