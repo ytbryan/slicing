@@ -41,15 +41,17 @@ module Slicing
     desc :clean, "clean up by removing rows with column value"
     def clean path, output, name, value
 
-      index = 0
+      index = -1
       str = ""
-      CSV.foreach(path, :headers => true, encoding: "ISO8859-1:utf-8") do |row|
+      CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
         str = row
         break
       end
-
+      # puts str
       index = str.index(name)
+      # puts index
       File.open(output, 'w') { |file|
+        file.write(str.join(",") + "\n")
         CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |line|
           file.write(line) if line[index] == value
         end
@@ -367,7 +369,8 @@ module Slicing
       output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
       stop = options[:line]
       counter = 0
-      CSV.foreach(path, :headers => true, encoding: "ISO8859-1:utf-8") do |row|
+      CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
+        puts row
         exit if counter == stop
         begin
           counter = counter + 1
