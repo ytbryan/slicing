@@ -1,0 +1,4 @@
+*0.1.2
+- slicing `cleanup` will remove all the empty lines
+- slicing `count` will print out the header without quote
+- slicing `clean` will remove lines which equate to the value
