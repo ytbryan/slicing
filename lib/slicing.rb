@@ -67,16 +67,6 @@ module Slicing
     #   end
     #
     # end
-    #
-    # desc :trim, "clean up by removing rows with column value"
-    # def trim path, output#, name, value
-    #   CSV.foreach(path) do |row|
-    #     row.map {|n| n.strip! || n}
-    #     CSV.open(output, "a+") do |csv|
-    #       csv << row
-    #     end
-    #   end
-    # end
 
     desc :cat, "cat two csv files and keep the headers using the first csv"
     def cat path, path_column, path2, path2_column, output
@@ -327,33 +317,33 @@ module Slicing
       puts array.uniq.count if array != nil
     end
 
-    desc :countagain, "count the number of rows and columns"
-    method_option :utf, type: :string, aliases: '-u', default: "ISO8859-1:utf-8"
-    method_option :headers, type: :boolean, aliases: '-h', default: true
-    method_option :rowsep, type: :string, aliases: '-r', default: nil
-    def countagain path
-        counter = 0
-        if options[:rowsep] != nil
-          CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8", :row_sep => "\r\n" ) do |row|
-          # CSV.foreach(path, { headers: options[:headers], return_headers: options[:headers], :row_sep=> options[:rowsep], :encoding => options[:utf]}) do |row|
-            STDOUT.write "\r #{counter}"
-            counter = counter + 1
-          end
-        else
-          CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8", :row_sep => "\r\n" ) do |row|
-            STDOUT.write "\r #{counter}"
-            counter = counter + 1
-          end
-        end
-      # data = CSV.read(csv_file, :headers => false, encoding: "ISO8859-1:utf-8")
-      # puts "#{data.count} rows #{data[0].count} columns"
-      puts "---"
-      # puts "#{data[0]}"
-      puts "---"
-      # print_header(data[0])
-      puts "---"
-      # print_header_with_quote(data[0])
-    end
+    # desc :countagain, "count the number of rows and columns"
+    # method_option :utf, type: :string, aliases: '-u', default: "ISO8859-1:utf-8"
+    # method_option :headers, type: :boolean, aliases: '-h', default: true
+    # method_option :rowsep, type: :string, aliases: '-r', default: nil
+    # def countagain path
+    #     counter = 0
+    #     if options[:rowsep] != nil
+    #       CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8", :row_sep => "\r\n" ) do |row|
+    #       # CSV.foreach(path, { headers: options[:headers], return_headers: options[:headers], :row_sep=> options[:rowsep], :encoding => options[:utf]}) do |row|
+    #         STDOUT.write "\r #{counter}"
+    #         counter = counter + 1
+    #       end
+    #     else
+    #       CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8", :row_sep => "\r\n" ) do |row|
+    #         STDOUT.write "\r #{counter}"
+    #         counter = counter + 1
+    #       end
+    #     end
+    #   # data = CSV.read(csv_file, :headers => false, encoding: "ISO8859-1:utf-8")
+    #   # puts "#{data.count} rows #{data[0].count} columns"
+    #   puts "---"
+    #   # puts "#{data[0]}"
+    #   puts "---"
+    #   # print_header(data[0])
+    #   puts "---"
+    #   # print_header_with_quote(data[0])
+    # end
 
 
     desc :count, "count the number of rows and columns"
@@ -377,7 +367,7 @@ module Slicing
       output_directory =  output #"/Users/ytbryan/Desktop/output/subset-2015.csv" #output directory
       stop = options[:line]
       counter = 0
-      CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
+      CSV.foreach(path, :headers => true, encoding: "ISO8859-1:utf-8") do |row|
         exit if counter == stop
         begin
           counter = counter + 1
