@@ -49,6 +49,15 @@ module Slicing
       }
     end
 
+    desc :merge, "merge two csv files either horizontally or vertically"
+    def merge path, path2, side
+      File.open(path, 'a+') { |file|
+        File.readlines(path2).each do |line|
+          file.write(line)
+        end
+      }
+    end
+
     desc :clean, "clean up by removing rows with column value"
     def clean path, output, name, value
 
