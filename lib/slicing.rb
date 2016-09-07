@@ -50,11 +50,17 @@ module Slicing
     end
 
     desc :merge, "merge two csv files either horizontally or vertically"
-    def merge path, path2, side
-      File.open(path, 'a+') { |file|
-        File.readlines(path2).each do |line|
-          file.write(line)
-        end
+    def merge path, path2, output # side
+      File.open(output, 'w') { |file|
+
+          File.readlines(path).each do |line|
+            file.write(line)
+          end
+          index = 0
+          CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |line|
+            file.write("#{line}\n")
+          end
+
       }
     end
 
