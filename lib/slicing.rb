@@ -28,6 +28,18 @@ module Slicing
     end
 
 
+    desc :replace, "replace original string with new string in file"
+    def replace path, output, original, new_string
+      File.open(output, 'w') { |file|
+        File.readlines(path).each do |line|
+          # file.write(line) if line.strip != ""
+          new_line = line.gsub(original, new_string) if line != nil
+          file.write(new_line)
+        end
+      }
+    end
+
+
     desc :cleanup, "clean up by removing rows no value"
     def cleanup path, output
       File.open(output, 'w') { |file|
@@ -351,9 +363,9 @@ module Slicing
     def count csv_file
       data = CSV.read(csv_file, :headers => false, encoding: "ISO8859-1:utf-8")
       puts "#{data.count} rows #{data[0].count} columns"
-      puts "---"
+      # puts "---"
       # puts "#{data[0]}"
-      puts "---"
+      # puts "---"
       # print_header(data[0])
       puts "---"
       print_header_with_quote(data[0])

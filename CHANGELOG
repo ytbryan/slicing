@@ -1,4 +1,5 @@
-*0.1.2
+*0.1.2.beta
 - slicing `cleanup` will remove all the empty lines
 - slicing `count` will print out the header without quote
 - slicing `clean` will remove lines which equate to the value
+- slicing `replace` will replace occurance of original string with a new string.
