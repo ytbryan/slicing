@@ -32,7 +32,6 @@ module Slicing
     def cleanup path, output
       File.open(output, 'w') { |file|
         File.readlines(path).each do |line|
-          # puts "'#{line}'"
           file.write(line) if line.strip != ""
         end
       }
@@ -353,9 +352,9 @@ module Slicing
       data = CSV.read(csv_file, :headers => false, encoding: "ISO8859-1:utf-8")
       puts "#{data.count} rows #{data[0].count} columns"
       puts "---"
-      puts "#{data[0]}"
+      # puts "#{data[0]}"
       puts "---"
-      print_header(data[0])
+      # print_header(data[0])
       puts "---"
       print_header_with_quote(data[0])
       puts "---"
