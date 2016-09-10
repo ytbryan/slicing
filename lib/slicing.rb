@@ -10,6 +10,19 @@ module Slicing
     default_task :help
 
 
+
+    # desc :info, "provide file size info"
+    # def info path
+    # end
+
+    desc :sample, "generate a sample file"
+    def sample path, column*
+    end
+
+    desc :info, "provide file size info"
+    def info path
+    end
+
     desc :produce, "produce output.csv with the column value equal to given value"
     def produce path, column_name, value, output
       index = 0
