@@ -3,3 +3,9 @@
 - slicing `count` will print out the header without quote
 - slicing `clean` will remove lines which equate to the value
 - slicing `replace` will replace occurance of original string with a new string.
+- slicing `info` will tell you the estimated size of a file
+- slicing `sample`
+
+IN THE PIPELINE
+- Ship some tests
+- Clean up all the codes by refactoring

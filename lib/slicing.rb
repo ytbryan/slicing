@@ -9,18 +9,37 @@ module Slicing
     package_name 'slicing'
     default_task :help
 
-
-
     # desc :info, "provide file size info"
     # def info path
     # end
 
+    desc :cc, "use wc -l to count"
+    def cc path
+      system("wc -l #{path}")
+    end
+
     desc :sample, "generate a sample file"
-    def sample path, column*
+    def sample output, row, *columns
+      #HEADERS
+      CSV.open(output, "a+") do |csv|
+        csv << columns
+      end
+
+      #produce a file based on hte path
+      CSV.open(output, "a+") do |csv|
+        row.to_i.times do
+          array = generate_random_array(columns.count)
+          csv << array
+        end
+      end
+
     end
 
     desc :info, "provide file size info"
     def info path
+      compressed_file_size = File.size(path).to_f / 2**20
+      formatted_file_size = '%.6f' % compressed_file_size
+      puts "Estimated #{formatted_file_size} mb"
     end
 
     desc :produce, "produce output.csv with the column value equal to given value"
@@ -231,16 +250,16 @@ module Slicing
       end
     end
 
-    desc :sample, "create a sample output"
-    def sample path, output_path, size
-      file_csv = CSV.read(path,:headers=> true, :encoding => "ISO8859-1:utf-8")
-      sample = file_csv.sample(size)
-      CSV.open(output_path, "a+") do |csv|
-        sample.each do |value|
-          csv << value
-        end
-      end
-    end
+    # desc :sample, "create a sample output"
+    # def sample path, output_path, size
+    #   file_csv = CSV.read(path,:headers=> true, :encoding => "ISO8859-1:utf-8")
+    #   sample = file_csv.sample(size)
+    #   CSV.open(output_path, "a+") do |csv|
+    #     sample.each do |value|
+    #       csv << value
+    #     end
+    #   end
+    # end
 
     desc :freq, "calculate item frequencies"
     def freq path, column_name, output_path
@@ -459,6 +478,18 @@ module Slicing
       STDOUT.write "\r #{index} - #{percent}% completed."
     end
 
+    def generate_random_array value
+      answer = []
+      value.times do
+        answer.push(randomise())
+      end
+      return answer
+    end
+
+
+    def randomise
+      return (0...8).map { (65 + rand(26)).chr }.join
+    end
     # def print_progress2 current
     #   percent = current/total * 100
     #   STDOUT.write "\r #{index} - #{percent}% completed."
