@@ -16,6 +16,8 @@ module Slicing
     desc :cc, "use wc -l to count"
     def cc path
       system("wc -l #{path}")
+
+      Slicing.head(path)
     end
 
     desc :sample, "generate a sample file"
@@ -358,16 +360,7 @@ module Slicing
 
     desc :head, "show the headers"
     def head csv_file
-      CSV.foreach(csv_file, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
-        puts row
-        puts "----"
-        puts "#{row.count} columns"
-        puts "----"
-        print_header(row)
-        puts "----"
-        print_header_with_quote(row)
-        exit
-      end
+      Slicing.head(csv_file)
     end
 
     desc :unique, "calculate number of unique values in column"
@@ -495,5 +488,18 @@ module Slicing
     #   STDOUT.write "\r #{index} - #{percent}% completed."
     # end
 
+  end
+
+  def self.head csv_file
+    CSV.foreach(csv_file, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
+      puts row
+      puts "----"
+      puts "#{row.count} columns"
+      puts "----"
+      print_header(row)
+      puts "----"
+      print_header_with_quote(row)
+      exit
+    end
   end
 end
