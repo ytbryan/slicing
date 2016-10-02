@@ -2,12 +2,29 @@ require "slicing/version"
 require 'digest/md5'
 require 'thor'
 require 'csv'
+require 'pg'
 
 module Slicing
   class Base < Thor
     check_unknown_options!
     package_name 'slicing'
     default_task :help
+
+    desc :test, "test"
+    def test
+      conn = PG.connect( dbname: 'sales' )
+
+
+      conn.exec( "SELECT * FROM pg_stat_activity" ) do |result|
+        puts "     PID | User             | Query"
+        result.each do |row|
+          puts " %7d | %-16s | %s " %
+            row.values_at('procpid', 'usename', 'current_query')
+        end
+      end
+
+      
+    end
 
     desc :sum, "compute the sum of a column"
     def sum path, column
