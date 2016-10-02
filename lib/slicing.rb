@@ -9,14 +9,32 @@ module Slicing
     package_name 'slicing'
     default_task :help
 
-    # desc :info, "provide file size info"
-    # def info path
-    # end
+    desc :sum, "compute the sum of a column"
+    def sum path, column
+      array = Slicing.read(path)
+      specific_column_array = array[column] if column != nil
+      answer = Slicing.sum(specific_column_array,column)
+      puts "#{answer}"
+    end
 
-    desc :cc, "use wc -l to count"
-    def cc path
+    desc :distinct, "find distinct count of a column"
+    def distinct path, column
+      array = Slicing.read(path)
+      specific_column_array = array[column] if column != nil
+      answer = Slicing.distinct_count(specific_column_array)
+      puts "#{answer}"
+      puts "#{column}:#{answer}"
+    end
+
+    desc :dimension, "set two dimensions of a csv file"
+    def dimension path, column1, column2
+      #
+    end
+
+    desc :quick, "use wc -l to count"
+    def quick path
       system("wc -l #{path}")
-
+      puts ""
       Slicing.head(path)
     end
 
@@ -61,7 +79,6 @@ module Slicing
       end
     end
 
-
     desc :replace, "replace original string with new string in file"
     def replace path, output, original, new_string
       File.open(output, 'w') { |file|
@@ -72,7 +89,6 @@ module Slicing
         end
       }
     end
-
 
     desc :cleanup, "clean up by removing rows no value"
     def cleanup path, output
@@ -86,7 +102,6 @@ module Slicing
     desc :merge, "merge two csv files either horizontally or vertically"
     def merge path, path2, output # side
       File.open(output, 'w') { |file|
-
           File.readlines(path).each do |line|
             file.write(line)
           end
@@ -94,7 +109,6 @@ module Slicing
           CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |line|
             file.write("#{line}\n")
           end
-
       }
     end
 
@@ -107,9 +121,9 @@ module Slicing
         str = row
         break
       end
-      # puts str
+
       index = str.index(name)
-      # puts index
+
       File.open(output, 'w') { |file|
         file.write(str.join(",") + "\n")
         CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |line|
@@ -117,28 +131,6 @@ module Slicing
         end
       }
     end
-
-    # desc :gsub, ""
-    # def gsub path, output, first, second
-    #   CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |row|
-    #     puts row
-    #     row.map {|n| n.gsub(first,second) if n !=nil}
-    #     CSV.open(output, "a+") do |csv|
-    #       csv << row
-    #     end
-    #   end
-    #
-    # end
-
-    # desc :cat, "cat two csv files and keep the headers using the first csv"
-    # def cat path, path_column, path2, path2_column, output
-    #
-    # end
-    #
-    # desc :combine, "combine"
-    # def combine path, path_column, path2, path2_column, output
-    #
-    # end
 
     desc :append, "append a value to all rows"
     def append path, output, value
@@ -178,17 +170,15 @@ module Slicing
         str = row
         break
       end
-      # array = str.to_s.split(",")
+
       index = str.index(column_name)
-      #get the number
+
       answer = 0
       CSV.foreach(path) do |row|
         answer = answer + 1 if row[index] == value
       end
       puts answer
     end
-
-
 
     desc :remove, "remove a header"
     def remove path, output
@@ -251,17 +241,6 @@ module Slicing
         index = index +1
       end
     end
-
-    # desc :sample, "create a sample output"
-    # def sample path, output_path, size
-    #   file_csv = CSV.read(path,:headers=> true, :encoding => "ISO8859-1:utf-8")
-    #   sample = file_csv.sample(size)
-    #   CSV.open(output_path, "a+") do |csv|
-    #     sample.each do |value|
-    #       csv << value
-    #     end
-    #   end
-    # end
 
     desc :freq, "calculate item frequencies"
     def freq path, column_name, output_path
@@ -370,47 +349,15 @@ module Slicing
       puts array.uniq.count if array != nil
     end
 
-    # desc :countagain, "count the number of rows and columns"
-    # method_option :utf, type: :string, aliases: '-u', default: "ISO8859-1:utf-8"
-    # method_option :headers, type: :boolean, aliases: '-h', default: true
-    # method_option :rowsep, type: :string, aliases: '-r', default: nil
-    # def countagain path
-    #     counter = 0
-    #     if options[:rowsep] != nil
-    #       CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8", :row_sep => "\r\n" ) do |row|
-    #       # CSV.foreach(path, { headers: options[:headers], return_headers: options[:headers], :row_sep=> options[:rowsep], :encoding => options[:utf]}) do |row|
-    #         STDOUT.write "\r #{counter}"
-    #         counter = counter + 1
-    #       end
-    #     else
-    #       CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8", :row_sep => "\r\n" ) do |row|
-    #         STDOUT.write "\r #{counter}"
-    #         counter = counter + 1
-    #       end
-    #     end
-    #   # data = CSV.read(csv_file, :headers => false, encoding: "ISO8859-1:utf-8")
-    #   # puts "#{data.count} rows #{data[0].count} columns"
-    #   puts "---"
-    #   # puts "#{data[0]}"
-    #   puts "---"
-    #   # print_header(data[0])
-    #   puts "---"
-    #   # print_header_with_quote(data[0])
-    # end
-
 
     desc :count, "count the number of rows and columns"
     def count csv_file
       data = CSV.read(csv_file, :headers => false, encoding: "ISO8859-1:utf-8")
       puts "#{data.count} rows #{data[0].count} columns"
-      # puts "---"
-      # puts "#{data[0]}"
-      # puts "---"
-      # print_header(data[0])
       puts "---"
-      print_header_with_quote(data[0])
+      Slicing.print_header_with_quote(data[0])
       puts "---"
-      print_header_with_no_quote(data[0])
+      Slicing.print_header_with_no_quote(data[0])
     end
 
     desc :subset, "create a subset of the data"
@@ -434,18 +381,6 @@ module Slicing
     end
 
     private
-
-    def print_header array
-      puts array.join(",") if array != nil
-    end
-
-    def print_header_with_no_quote array
-      puts "#{array.join(" ")}" if array != nil
-    end
-
-    def print_header_with_quote array
-      puts "'#{array.join("' '")}'" if array != nil
-    end
 
     def process_options headers, rowsep, utf
       if headers == nil
@@ -490,6 +425,11 @@ module Slicing
 
   end
 
+  def self.read path
+    return CSV.read(path, :headers => true, encoding: "ISO8859-1:utf-8")
+  end
+
+
   def self.head csv_file
     CSV.foreach(csv_file, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
       puts row
@@ -502,4 +442,55 @@ module Slicing
       exit
     end
   end
+
+  def self.print_header array
+    puts array.join(",") if array != nil
+  end
+
+  def self.print_header_with_no_quote array
+    puts "#{array.join(" ")}" if array != nil
+  end
+
+  def self.print_header_with_quote array
+    puts "'#{array.join("' '")}'" if array != nil
+  end
+
+  def self.golang
+    system("awk ")
+  end
+
+  def self.awk
+    system("awk ")
+  end
+
+  ######################
+  ### SLICING 2.0
+  ######################
+
+  def self.distinct array
+    return array.uniq
+  end
+
+  def self.distinct_count array
+    return array.uniq.count
+  end
+
+  def self.sum array, column
+    answer = 0
+    array.each do |each_integer|
+      if each_integer != nil && self.is_number?(each_integer) == true
+        answer = answer + each_integer.to_f
+      end
+    end
+    return answer
+  end
+
+  def self.is_number? string
+    true if Float(string) rescue false
+  end
+
+  def self.import path
+
+  end
+
 end
