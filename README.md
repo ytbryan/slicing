@@ -1,6 +1,7 @@
 # Slicing
 :v: Instant slice and dice your csv files for quick analysis via command line.
 
+Slicing is an open-source command-line tool for data analysis, extract, transform and load.
 
 #Features
 

@@ -3,6 +3,8 @@ require 'digest/md5'
 require 'thor'
 require 'csv'
 require 'pg'
+require 'sequel'
+require 'open3'
 
 module Slicing
   class Base < Thor
@@ -10,20 +12,52 @@ module Slicing
     package_name 'slicing'
     default_task :help
 
-    desc :test, "test"
-    def test
+    desc :import, "import"
+    def import path
       conn = PG.connect( dbname: 'sales' )
 
-
-      conn.exec( "SELECT * FROM pg_stat_activity" ) do |result|
+      conn.exec( "SELECT * FROM stat_activity" ) do |result|
         puts "     PID | User             | Query"
         result.each do |row|
           puts " %7d | %-16s | %s " %
             row.values_at('procpid', 'usename', 'current_query')
         end
       end
+    end
 
-      
+    desc :megalist, "mega list"
+    def megalist path
+      puts "hello"
+
+      file_csv = CSV.read(path,:headers=> false, :encoding => "ISO8859-1:utf-8")
+      # puts file_csv[0]
+      headers = file_csv[0].to_a if file_csv != nil
+      if headers != nil
+        headers.each_with_index do |each_column,index|
+          array = file_csv[each_column]
+          puts array.uniq
+          puts "--"
+          puts "#{array.uniq.count} items"
+        end
+      end
+
+    end
+
+
+    desc :createtest, "test"
+    def createtest path
+
+    end
+
+    desc :test, "test"
+    def test path
+      # conn = PG.connect( dbname: 'sales' )
+
+      # db = Sequel.postgres("sales")
+      db = Sequel.connect("postgres://ytbryan:workhard@localhost:5432/sales",
+  :max_connections => 10, :logger => nil)
+      db.copy_into(:stat_activity, format: :csv, opts: "HEADER", data: File.read(path))
+
     end
 
     desc :sum, "compute the sum of a column"
@@ -50,8 +84,8 @@ module Slicing
 
     desc :quick, "use wc -l to count"
     def quick path
-      system("wc -l #{path}")
-      puts ""
+      output = Open3.popen3("wc -l #{path}") { |stdin, stdout, stderr, wait_thr| stdout.read }
+      puts "#{output.split(" ")[0]} rows" if output != nil
       Slicing.head(path)
     end
 
@@ -122,10 +156,20 @@ module Slicing
           File.readlines(path).each do |line|
             file.write(line)
           end
-          index = 0
-          CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |line|
-            file.write("#{line}\n")
+
+          File.readlines(path2).each do |line|
+            file.write(line)
           end
+
+          # index = 0
+
+          # CSV.foreach(path,:headers=> true, :encoding => "ISO8859-1:utf-8") do |line|
+          #   file.write("#{line}\n")
+          # end
+          #
+          # CSV.foreach(path2,:headers=> true, :encoding => "ISO8859-1:utf-8") do |line|
+          #   file.write("#{line}\n")
+          # end
       }
     end
 
@@ -200,7 +244,7 @@ module Slicing
     desc :remove, "remove a header"
     def remove path, output
       index = 0
-      CSV.foreach(path) do |row|
+      CSV.foreach(path, encoding: "ISO8859-1:utf-8") do |row|
         CSV.open(output, "a+") do |csv|
           if index != 0
             csv << row
@@ -214,7 +258,7 @@ module Slicing
     desc :add, "add a header"
     def add path, output, *headers
       index = 0
-      CSV.foreach(path) do |row|
+      CSV.foreach(path, encoding: "ISO8859-1:utf-8") do |row|
         CSV.open(output, "a+") do |csv|
           if index == 0
             csv << headers
@@ -449,7 +493,7 @@ module Slicing
 
   def self.head csv_file
     CSV.foreach(csv_file, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
-      puts row
+      # puts row
       puts "----"
       puts "#{row.count} columns"
       puts "----"
