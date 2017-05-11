@@ -124,7 +124,7 @@ module Slicing
       index = str.index(column_name)
       answer = 0
       CSV.open(output, "a+") do |csv|
-        CSV.foreach(path) do |row|
+        CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
           csv << row if row[index] == value
         end
       end
@@ -335,7 +335,7 @@ module Slicing
     desc :retain, "retain only these column"
     def retain path, output, *names
       value = ""
-      CSV.foreach(path) do |data|
+      CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |data|
         value = data
         break
       end
@@ -353,7 +353,7 @@ module Slicing
       # puts array.count
       answer =
       CSV.open(output,"a+") do |csv|
-        CSV.foreach(path) do |row|
+        CSV.foreach(path, :headers => false, encoding: "ISO8859-1:utf-8") do |row|
           answer = []
           array.each do |each|
             answer.push(row[each])
